@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>동전 던지기 1:1 게임</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+    #scoreboard { margin-top: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+
+<h1>동전 던지기 게임 (플레이어 vs 컴퓨터)</h1>
+
+<label for="targetScore">몇 점 먼저 얻으면 승리할까요?</label>
+<input type="number" id="targetScore" min="1" value="3">
+<button onclick="startGame()">게임 시작</button>
+
+<div id="gameArea" style="display:none;">
+  <p>앞 또는 뒤를 선택하세요:</p>
+  <button onclick="makeGuess('앞')">앞</button>
+  <button onclick="makeGuess('뒤')">뒤</button>
+
+  <div id="roundResult"></div>
+  <div id="scoreboard"></div>
+</div>
+
+<script>
+  let userScore = 0;
+  let computerScore = 0;
+  let targetScore = 3;
+
+  function startGame() {
+    targetScore = parseInt(document.getElementById("targetScore").value);
+    if (isNaN(targetScore) || targetScore <= 0) {
+      alert("양의 정수를 입력하세요!");
+      return;
+    }
+    userScore = 0;
+    computerScore = 0;
+    document.getElementById("gameArea").style.display = "block";
+    updateScoreboard();
+    document.getElementById("roundResult").innerHTML = "";
+  }
+
+  function tossCoin() {
+    return Math.random() < 0.5 ? "앞" : "뒤";
+  }
+
+  function makeGuess(userGuess) {
+    const computerGuess = tossCoin();
+    const result = tossCoin();
+
+    let userPoint = userGuess === result ? 1 : 0;
+    let computerPoint = computerGuess === result ? 1 : 0;
+
+    userScore += userPoint;
+    computerScore += computerPoint;
+
+    let roundText = `
+      <p>🧑 플레이어 예측: ${userGuess} | 🤖 컴퓨터 예측: ${computerGuess}</p>
+      <p>🪙 동전 결과: ${result}</p>
+      <p>🎯 플레이어: ${userPoint ? "성공! (+1점)" : "실패"} | 컴퓨터: ${computerPoint ? "성공! (+1점)" : "실패"}</p>
+    `;
+
+    document.getElementById("roundResult").innerHTML = roundText;
+    updateScoreboard();
+
+    if (userScore >= targetScore || computerScore >= targetScore) {
+      setTimeout(() => {
+        alert(userScore >= targetScore ? "🎉 플레이어 승리!" : "🤖 컴퓨터 승리!");
+        document.getElementById("gameArea").style.display = "none";
+      }, 300);
+    }
+  }
+
+  function updateScoreboard() {
+    document.getElementById("scoreboard").innerHTML =
+      `<strong>현재 점수</strong><br>🧑 플레이어: ${userScore}점 | 🤖 컴퓨터: ${computerScore}점`;
+  }
+</script>
+
+</body>
+</html>
